@@ -4,11 +4,11 @@ This script provides the ability to perform automatic DNS validation using the L
 
 # Installation
 
-This script is compatible with Python 2 and 3. The only external dependency that is required is BeautifulSoup. The following command can be used to install it:
+This script is compatible with Python 2 and 3. The only external dependencies that are required are BeautifulSoup and Requests. The following command can be used to install them:
 
-Python 2: `pip install beautifulsoup4`
+Python 2: `pip install beautifulsoup4 requests`
 
-Python 3: `pip3 install beautifulsoup4`
+Python 3: `pip3 install beautifulsoup4 requests`
 
 # Configuration
 
