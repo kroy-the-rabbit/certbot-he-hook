@@ -18,7 +18,6 @@ In order to use this hook, the following values must be provided:
 |---|---|
 | HE_USERNAME | Username used to authenticate with HE |
 | HE_PASSWORD | Password used to authenticate with HE |
-| HE_ZONE | "Hosted zone" for the record to be created under, e.g. adammiller.io for example.adammiller.io |
 | HE_PROPAGATION_SECONDS | (Optional) Time to wait before ending execution of the auth hook, defaults to 30 seconds |
 
 # Usage
@@ -26,7 +25,7 @@ In order to use this hook, the following values must be provided:
 The following is an example execution of certbot using the hook in order to validate example.adammiller.io, this assumes that the script is located at `/opt/certbot-he-hook.py` and is executable:
 
 ```
-HE_USERNAME=adammillerio HE_PASSWORD=admin123 HE_ZONE=adammiller.io \
+HE_USERNAME=adammillerio HE_PASSWORD=admin123 \
 	certbot certonly \
 	--domain example.adammiller.io \
 	--email admin@adammiller.io \
@@ -40,7 +39,7 @@ HE_USERNAME=adammillerio HE_PASSWORD=admin123 HE_ZONE=adammiller.io \
 In addition, here is an example of certificate renewal:
 
 ```
-HE_USERNAME=adammillerio HE_PASSWORD=admin123 HE_ZONE=adammiller.io \
+HE_USERNAME=adammillerio HE_PASSWORD=admin123 \
 	certbot renew \
 	--preferred-challenges dns \
 	--manual-auth-hook "/opt/certbot-he-hook.py"  \
@@ -69,7 +68,7 @@ The script automatically determines which routine to run based on the presence o
 The authentication routine performs the following steps:
 
 * Login to HE
-* Retrieve the "Hosted Zone ID" provided in the HE_ZONE variable
+* Retrieve the "Hosted Zone ID" provided by certbot
 * Create the TXT record used for DNS validation by certbot
 * Sleep for the time provided in HE_PROPAGATION_SECONDS, or 30 seconds if undefined, in order to ensure the record creation has propagated
 * Retrieve the "Hosted Record ID" of the newly created record
@@ -81,12 +80,8 @@ The cleanup routine performs the following steps:
 
 * Parse the record ID printed to stdout and provided to the cleanup hook as CERTBOT_AUTH_OUTPUT
 * Login to HE
-* Retrieve the "Hosted Zone ID" provided in the HE_ZONE variable
+* Retrieve the "Hosted Zone ID" provided by certbot
 * Delete the DNS record with the associated record ID
-
-# Limitations
-
-Currently, due to the way it is implemented, this will only work with `certbot renew` if all certificates are for the same zone (domain). In order to work around this, multiple `certbot renew` invocations can be made with different values for HE_ZONE.
 
 # Disclaimer
 

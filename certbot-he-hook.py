@@ -14,13 +14,13 @@ def main():
     try:
         he_username = environ["HE_USERNAME"]
         he_password = environ["HE_PASSWORD"]
-        he_zone = environ["HE_ZONE"]
+        he_zone = environ["CERTBOT_DOMAIN"]
         certbot_domain = environ["CERTBOT_DOMAIN"]
         certbot_validation = environ["CERTBOT_VALIDATION"]
     except KeyError as error:
         eprint("ERROR: Required environment variable %s is unset" % error)
         return 1
-    
+
     # Login to HE
     try:
         session = login(he_username, he_password)
@@ -36,7 +36,7 @@ def main():
         cleanup = False
     else:
         cleanup = True
-    
+
     # Cleanup routine
     if cleanup:
         # Delete the record id that is passed into CERTBOT_AUTH_OUTPUT, and complete
@@ -82,13 +82,13 @@ def login(username, password):
 
     Returns:
         A requests.Session object that is authenticated to HE
-    
+
     Raises:
         ValueError: If the login is not successful
     """
 
     # Create the session GET the login page to retrieve a session cookie
-    session = Session()    
+    session = Session()
     session.get(
         "https://dns.he.net/"
     )
@@ -117,10 +117,10 @@ def get_zone_id(session, zone):
     Args:
         session: Authenticated session to HE
         zone: Name of the zone (domain)
-    
+
     Returns:
         The ID of the zone from HE
-    
+
     Raises:
         ValueError: If the zone is not found in the HE account
     """
@@ -149,7 +149,7 @@ def delete_validation(session, zone, record_id):
         session: Authenticated session to HE
         zone: Name of the zone (domain)
         record_id: ID of the validation record to be deleted
-    
+
     Raises:
         ValueError: If unable to resolve the zone provided
         RuntimeError: If unable to delete the validation record with the ID provided
@@ -160,7 +160,7 @@ def delete_validation(session, zone, record_id):
         zone_id = get_zone_id(session, zone)
     except ValueError as error:
         raise error
-    
+
     # POST to the DNS management UI with form values to delete the record
     delete_response = session.post(
         "https://dns.he.net/index.cgi",
@@ -188,10 +188,10 @@ def set_validation(session, zone, certbot_domain, certbot_validation):
         zone: Name of the zone (domain)
         certbot_domain: Domain that certbot is performing validation on
         certbot_validation: Validation string to be placed in the TXT record
-    
+
     Returns:
         The ID of the created validation record
-    
+
     Raises:
         ValueError: If unable to resolve the zone provided
         RuntimeError: If unable to create the validation record
@@ -240,11 +240,11 @@ def set_validation(session, zone, certbot_domain, certbot_validation):
             if value.get_text() == record_name:
                 found = True
                 break
-        
+
         # If found, return the contents of the "id" attribute on the <tr> tag
         if found:
             return record["id"]
-    
+
     # If none of the rows match the validation record, error
     raise RuntimeError("ERROR: Record not created or not found in HE, check that it was created")
 
